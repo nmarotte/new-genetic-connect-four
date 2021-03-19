@@ -55,7 +55,7 @@ class Connect4Game(Observable):
 		super().__init__()
 		self._rows = rows
 		self._cols = cols
-		self._board = None
+		self.board = None
 		self._turn = None
 		self._won = None
 		self.reset_game()
@@ -64,7 +64,7 @@ class Connect4Game(Observable):
 		"""
 		Resets the game state (board and variables)
 		"""
-		self._board = [[0 for _ in range(self._rows)] for _ in range(self._cols)]
+		self.board = [[0 for _ in range(self._rows)] for _ in range(self._cols)]
 		self._turn = random.randint(1, 2)
 		self._won = None
 		self.notify(Event.GAME_RESET)
@@ -76,8 +76,8 @@ class Connect4Game(Observable):
 		:return: position of placed colour or None if not placeable
 		"""
 		for r in range(self._rows):
-			if self._board[c][r] == 0:
-				self._board[c][r] = self._turn
+			if self.board[c][r] == 0:
+				self.board[c][r] = self._turn
 
 				if self._turn == 1:
 					self._turn = 2
@@ -97,7 +97,7 @@ class Connect4Game(Observable):
 		"""
 		c = pos[0]
 		r = pos[1]
-		player = self._board[c][r]
+		player = self.board[c][r]
 
 		min_col = max(c-3, 0)
 		max_col = min(c+3, self._cols-1)
@@ -107,7 +107,7 @@ class Connect4Game(Observable):
 		# Horizontal check
 		count = 0
 		for ci in range(min_col, max_col + 1):
-			if self._board[ci][r] == player:
+			if self.board[ci][r] == player:
 				count += 1
 			else:
 				count = 0
@@ -119,7 +119,7 @@ class Connect4Game(Observable):
 		# Vertical check
 		count = 0
 		for ri in range(min_row, max_row + 1):
-			if self._board[c][ri] == player:
+			if self.board[c][ri] == player:
 				count += 1
 			else:
 				count = 0
@@ -134,7 +134,7 @@ class Connect4Game(Observable):
 		for i in range(-3, 4):
 			# bottom-left -> top-right
 			if 0 <= c + i < self._cols and 0 <= r + i < self._rows:
-				if self._board[c + i][r + i] == player:
+				if self.board[c + i][r + i] == player:
 					count1 += 1
 				else:
 					count1 = 0
@@ -144,7 +144,7 @@ class Connect4Game(Observable):
 					return self._won
 			# bottom-right -> top-let
 			if 0 <= c + i < self._cols and 0 <= r - i < self._rows:
-				if self._board[c + i][r - i] == player:
+				if self.board[c + i][r - i] == player:
 					count2 += 1
 				else:
 					count2 = 0
@@ -154,7 +154,7 @@ class Connect4Game(Observable):
 					return self._won
 
 		# Draw check
-		if sum([x.count(0) for x in self._board]) == 0:
+		if sum([x.count(0) for x in self.board]) == 0:
 			self._won = 0
 			self.notify(Event.GAME_WON, self._won)
 			return self._won
@@ -190,7 +190,7 @@ class Connect4Game(Observable):
 		"""
 		:return: A copy of the game board
 		"""
-		return self._board.copy()
+		return self.board.copy()
 
 	def board_at(self, c, r):
 		"""
@@ -198,7 +198,7 @@ class Connect4Game(Observable):
 		:param: r, the row
 		:return: What value is held at column c, row r in the board
 		"""
-		return self._board[c][r]
+		return self.board[c][r]
 
 	def copy_state(self):
 		"""
