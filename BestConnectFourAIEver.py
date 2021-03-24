@@ -9,9 +9,23 @@ nb_neurons_first_layer = np.zeros((6, 7), dtype=np.float64)  # 7 * 6 nb rows * n
 nb_neurons_output_layer = np.zeros(7, dtype=np.float64)
 
 
+def transform_board(board):
+    matrix = np.zeros((7, 6, 3), dtype=bool)
+    for i, row in enumerate(board):
+        for j, case in enumerate(row):
+            matrix[i][j][case] = 1
+
+    column_not_full = np.full(7, dtype=bool, fill_value=False)
+    for i, row in enumerate(matrix):
+        if row[-1][0]:  # if case[1] or case[2]
+            column_not_full[i] = True
+
+    return matrix, column_not_full
+
+
 class TriGiNa:
     def __init__(self):
-        self.shape = (7, 7, 6)
+        self.shape = (7, 7, 6, 3)
         self.connexions = np.random.normal(0, 0.05, self.shape)
         self.score = 0
 
@@ -26,10 +40,17 @@ class TriGiNa:
             self.update()
 
     def get_choice(self, board=None):
-        board = np.array(board)
-        print(board.shape, self.connexions[0].shape)
-        res = np.unravel_index(np.argmax(self.connexions, axis=None), self.shape)[0]
-        return res
+        matrix, column_not_full = transform_board(board)
+        a, b = np.reshape(matrix, (1, 7 * 6 * 3)), np.reshape(self.connexions, (7 * 6 * 3, 7))
+        result = np.matmul(a, b)[0]
+        current_max = -np.Infinity
+        position = None
+        for i, res in enumerate(result):
+            if column_not_full[i]:
+                if res > current_max:
+                    current_max = res
+                    position = i
+        return position
 
 
 if __name__ == '__main__':
@@ -68,28 +89,43 @@ if __name__ == '__main__':
 
     # ai vs ai
     nb_agents = 10
+    nb_generation = 1000
     players = [TriGiNa() for _ in range(nb_agents)]
 
-    for i in range(10):
-        for j in range(i + 1, 10):
-            game = Connect4Game()
-            game.reset_game()
-
-            winner = game.get_win()
-
-            while winner is None:
-                if nb_placed % 2 == ai_goes_first:
-                    game.place(players[i].get_choice(game.board))  # This is where the AI chooses its play
-                    nb_placed += 1
-
-                else:
-                    game.place(players[j].get_choice(game.board))  # This is where the AI chooses its play
-                    nb_placed += 1
+    for g in range(nb_generation):
+        for i in range(nb_agents):
+            for j in range(i + 1, nb_agents):
+                game = Connect4Game()
+                game.reset_game()
 
                 winner = game.get_win()
 
-            if winner != 0:
-                players[game.get_win() - 1].score += 1  # adds 1 to the winner
-            game.reset_game()
+                while winner is None:
+                    if nb_placed % 2 == ai_goes_first:
+                        game.place(players[i].get_choice(game.board))  # This is where the AI chooses its play
+                        nb_placed += 1
 
+                    else:
+                        game.place(players[j].get_choice(game.board))  # This is where the AI chooses its play
+                        nb_placed += 1
+
+                    winner = game.get_win()
+
+                if winner == 1:
+                    players[i].score += 1  # adds 1 to the winner
+                elif winner == 2:
+                    players[j].score += 1
+                game.reset_game()
+
+        best_player = players[0]
+        for player in players:
+            if player.score > best_player.score:
+                best_player = player
+
+        if g != nb_generation-1:
+            best_player.score = 0
+            players = [TriGiNa() for _ in range(nb_agents-1)] + [best_player]
+
+    for player in players:
+        print(player.score)
     pygame.quit()
