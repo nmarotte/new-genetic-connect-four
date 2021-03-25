@@ -26,13 +26,11 @@ def transform_board(board):
 class TriGiNa:
     def __init__(self, oldest_gen):
         self.in_shape = 7*6*3
-        self.one_shape = 7*6
-        self.two_shape = 6*7
+        self.mid_shape = 10
         self.out_shape = 7
 
-        self.connexions_in_one = np.random.normal(0, 1, (self.in_shape, self.one_shape))
-        self.connexions_one_two = np.random.normal(0, 1, (self.one_shape, self.two_shape))
-        self.connexions_two_out = np.random.normal(0, 1, (self.two_shape, self.out_shape))
+        self.connexions_in_mid = np.random.normal(0, 1, (self.in_shape, self.mid_shape))
+        self.connexions_mid_out = np.random.normal(0, 1, (self.mid_shape, self.out_shape))
 
         self.score = 0
         self.nb_played = 0
@@ -40,9 +38,8 @@ class TriGiNa:
 
     def get_choice(self, board=None):
         matrix, column_not_full = transform_board(board)
-        first = np.matmul(np.reshape(matrix, (1, 126)), self.connexions_in_one)[0]
-        second = np.matmul(first, self.connexions_one_two)
-        out = np.matmul(second, self.connexions_two_out)
+        first = np.matmul(np.reshape(matrix, (1, 126)), self.connexions_in_mid)[0]
+        out = np.matmul(first, self.connexions_mid_out)
         current_max = -np.Infinity
         position = None
         for i, res in enumerate(out):
@@ -54,10 +51,8 @@ class TriGiNa:
 
     def make_baby(self, agent):
         new_agent = TriGiNa(agent.index)
-        ones = np.full(self.connexions_in_one.shape, fill_value=1)
-        new_agent.connexions_in_one = np.random.normal((self.connexions_in_one + agent.connexions_in_one) / 2, 1, (self.in_shape, self.one_shape))
-        new_agent.connexions_one_two = np.random.normal((self.connexions_one_two + agent.connexions_one_two) / 2, 1, (self.one_shape, self.two_shape))
-        new_agent.connexions_two_out = np.random.normal((self.connexions_two_out + agent.connexions_two_out) / 2, 1, (self.two_shape, self.out_shape))
+        new_agent.connexions_in_mid = (self.connexions_in_mid + agent.connexions_in_mid) / 2
+        new_agent.connexions_mid_out = (self.connexions_mid_out + agent.connexions_mid_out) / 2
         new_agent.index = min(self.index, agent.index)
         return new_agent
 
