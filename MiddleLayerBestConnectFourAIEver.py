@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
     # ai vs ai
     main_nb_agents = 30
-    nb_generation = 100
+    nb_generation = 1000
     main_players = [TriGiNa(agents_count + i) for i in range(main_nb_agents)]
     agents_count += main_nb_agents
 
