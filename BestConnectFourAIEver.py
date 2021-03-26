@@ -4,23 +4,10 @@ import numpy as np
 import pygame
 
 from game import Connect4Game, Connect4Viewer, SQUARE_SIZE
+from utils import transform_board
 
 nb_neurons_first_layer = np.zeros((6, 7), dtype=np.float64)  # 7 * 6 nb rows * nb columns
 nb_neurons_output_layer = np.zeros(7, dtype=np.float64)
-
-
-def transform_board(board):
-    matrix = np.zeros((7, 6, 3), dtype=bool)
-    for i, row in enumerate(board):
-        for j, case in enumerate(row):
-            matrix[i][j][case] = 1
-
-    column_not_full = np.full(7, dtype=bool, fill_value=False)
-    for i, row in enumerate(matrix):
-        if row[-1][0]:  # if case[1] or case[2]
-            column_not_full[i] = True
-
-    return matrix, column_not_full
 
 
 class TriGiNa:
