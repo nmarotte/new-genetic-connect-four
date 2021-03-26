@@ -1,37 +1,9 @@
+import time
+
 import numpy as np
 
-loc = 0
-scale = 0.5
-INPUT_SHAPE = 7 * 6 * 3
-OUTPUT_SHAPE = 7
-MIN_HIDDEN_LAYERS = 0
-MAX_HIDDEN_LAYERS = 10
-MIN_SHAPE = 7
-MAX_SHAPE = 126
-
-nb_agents_spawned = 0
-
-
-def new_index():
-    global nb_agents_spawned
-    nb_agents_spawned += 1
-    return nb_agents_spawned
-
-
-def random_nb_layers():
-    return np.random.randint(MIN_HIDDEN_LAYERS, MAX_HIDDEN_LAYERS)
-
-
-def random_layer_shape():
-    return np.random.randint(MIN_SHAPE, MAX_SHAPE)
-
-
-def random_normal_weights(in_shape, out_shape):
-    return np.random.normal(loc, scale, size=(in_shape, out_shape))
-
-
-def construct_hidden_layers(shapes: list):
-    return [random_normal_weights(shapes[i], shapes[i + 1]) for i in range(len(shapes) - 1)]
+from game import Connect4Game
+from utils import *
 
 
 class Agent:
@@ -50,11 +22,20 @@ class Agent:
 
     def __init__(self, shapes: list, index: int):
         self.layers = construct_hidden_layers(shapes)
+        self.shapes = shapes
         self.index = index
-        self.moves = []
+        self.moves = []  # TODO will store what path was taken from the argmax neuron
 
+    @measure
     def get_choice(self, board):
+        # flatten the matrix and get if column is full
         matrix, column_not_full = transform_board(board)
+        matrix = np.reshape(matrix, (1, self.shapes[0]))
+        transmission = np.matmul(matrix, self.layers[0])
+        for i in range(1, len(self.layers)):
+            transmission = activation_function(np.matmul(transmission, self.layers[i]))
+        transmission = activation_function(np.multiply(column_not_full, transmission))
+        return np.argmax(transmission)
 
     def print_layers_dimensions(self):
         print("Agent")
@@ -65,4 +46,7 @@ class Agent:
 if __name__ == '__main__':
     main_agents = [Agent.spawn_agent() for _ in range(10)]
     for main_agent in main_agents:
-        main_agent.print_layers_dimensions()
+        print(main_agent.index)
+    game = Connect4Game()
+    game.reset_game()
+    print(main_agents[0].get_choice(game.board))
