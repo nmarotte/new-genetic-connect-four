@@ -1,4 +1,4 @@
-from GeneticFunctions import *
+import GeneticFunctions
 from utils import *
 
 
@@ -14,7 +14,7 @@ class Agent:
 
     @classmethod
     def mix_agents(cls, agents: list):
-        pass
+        return cls(GeneticFunctions.mix_shapes(agents), new_index())
 
     def __init__(self, shapes: list, index: int):
         self.layers = construct_hidden_layers(shapes)
@@ -27,7 +27,7 @@ class Agent:
 
     def __str__(self):
         return f"Agent {self.index} played {self.nb_played} times and won {self.score} times " \
-               f"({round(100*self.score/self.nb_played)}%)"
+               f"({round(100*self.score/self.nb_played)}%). Shapes = {self.shapes}"
 
     def get_choice(self, board):
         # flatten the matrix and get if column is full
@@ -44,8 +44,18 @@ class Agent:
         for i, layer in enumerate(self.layers):
             print(f"Layer {i} : {layer.shape}")
 
+    @classmethod
+    def spawn_agents(cls, n: int):
+        return [Agent.spawn_agent() for _ in range(n)]
+
 
 if __name__ == '__main__':
-    main_agents = [Agent.spawn_agent() for _ in range(10)]
-    for p in generation_tournament(main_agents):
-        print(p)
+    nb_agents = 25
+    nb_generations = 50
+    print(f"Population of {nb_agents} agents over {nb_generations} generations with {MIN_HIDDEN_LAYERS} to "
+          f"{MAX_HIDDEN_LAYERS} layers of {MIN_SHAPE} to {MAX_SHAPE} neurons each")
+    for g in range(nb_generations):
+        print(f"Generation {g}")
+        main_agents = Agent.spawn_agents(nb_agents)
+        sorted_main_agents = GeneticFunctions.generation_tournament(main_agents)
+        print(f"Best agent of generation : {main_agents[0]}")
