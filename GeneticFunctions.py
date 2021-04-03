@@ -1,6 +1,33 @@
+import random
+
+import pygame
+
 from GeneticLayers import Agent
-from game import Connect4Game
+from game import Connect4Game, SQUARE_SIZE, Connect4Viewer
 import numpy as np
+
+
+def play_human(alex: Agent):
+    game = Connect4Game()
+    game.reset_game()
+    view = Connect4Viewer(game=game)
+    view.initialize()
+    running = True
+    while running:
+        for i, event in enumerate(pygame.event.get()):
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                if game.get_win() is None:
+                    placement = game.place(pygame.mouse.get_pos()[0] // SQUARE_SIZE)
+                    if placement is None:  # Still player's turn if placement fails
+                        continue
+                    if game.get_win() is not None:
+                        game.reset_game()
+                    player_a_choice = alex.get_choice(game.board, show=True)
+                    game.place(player_a_choice)
+                else:
+                    game.reset_game()
 
 
 def play_one_game(alex: Agent, bob: Agent) -> Agent:
@@ -8,22 +35,29 @@ def play_one_game(alex: Agent, bob: Agent) -> Agent:
     game.reset_game()
 
     winner = game.get_win()
+    if random.randint(0,1):  # Pick first player at random
+        alex, bob = bob, alex
 
     while winner is None:
-        player_a_choice = alex.get_choice(game.board)
-        game.place(player_a_choice)
+        game.place(alex.get_choice(game.board))
         winner = game.get_win()
         if winner is not None:
             break
 
-        player_b_choice = bob.get_choice(game.board)
-        game.place(player_b_choice)
+        game.place(bob.get_choice(game.board))
         winner = game.get_win()
 
     return alex if winner == 1 else bob if winner == 2 else None
 
 
 def generation_tournament(players: list[Agent]):
+    # Training phase
+    for _ in range(200):
+        alex, bob = np.random.choice(players, size=2, replace=False)
+        winner = play_one_game(alex, bob)
+        winner.backpropagation()
+
+    # Competition phase
     for i in range(len(players) - 1):
         for j in range(i + 1, len(players)):
             alex, bob = players[i], players[j]
@@ -31,7 +65,8 @@ def generation_tournament(players: list[Agent]):
             alex.nb_played += 1
             bob.nb_played += 1
             if winner is not None:
-                winner.score += 1
+                winner.score += 1 / winner.moves_of_game
+                winner.backpropagation()
     players.sort(key=lambda p: p.score, reverse=True)
     return players
 
