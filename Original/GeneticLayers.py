@@ -1,5 +1,3 @@
-from pprint import pprint
-
 import GeneticFunctions
 from utils import *
 
