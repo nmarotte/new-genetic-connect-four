@@ -38,7 +38,7 @@ class MinimaxPlayer:
             self.board[coup][-1] = 0
 
 
-    def AIalgorithm(self, profondeur=2, maxi=True):
+    def chooseAction(self, profondeur=2, maxi=True):
         """
         Algorithme AI
         """
@@ -57,7 +57,7 @@ class MinimaxPlayer:
             self.act(coup, player, simulate=True)
             winners = self.check_win(self.board, coup)  # we suppose that the first time it's going to be empty
             if len(winners) == 0:
-                score = self.AIalgorithm(profondeur - 1, not maxi)[1]
+                score = self.chooseAction(profondeur - 1, not maxi)[1]
             else:
                 winner = winners.pop()
                 if winner == self.player:

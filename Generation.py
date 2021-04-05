@@ -4,7 +4,6 @@ from NeuralNetwork import NeuralNetwork, NeuralNetworkPlayer
 from MinMax import MinimaxPlayer
 import numpy as np
 from game import Connect4Game, Connect4Viewer, SQUARE_SIZE
-from pprint import pprint
 
 INPUT_LAYER = 126
 OUTPUT_LAYER = 7
@@ -23,45 +22,68 @@ class Generation:
 
     def tournament(self):
         for gen in range(self.nb_generations):
+            """
             for game in range(self.nb_games):
                 for i in range(self.nb_players):
                     for j in range(self.nb_players):
                         if i != j:
-                            winner = self.play(i, j)
-                            if winner == -1:
+                            winner = self.play(self.players[i], self.players[j], game = Connect4Game())
+                            if winner == 0:
                                 self.players[i].addScore(0.25)
                                 self.players[j].addScore(0.25)
+                            elif winner == 1:
+                                self.players[i].addScore(1)
                             else:
-                                self.players[winner].addScore(1)
+                                self.players[j].addScore(1)
+            """
+            if gen%10 == 0: print(gen)
             self.nextGen()
 
-    def play(self, i, j):
-        game = Connect4Game()
-        player1 = self.players[i]
-        player2 = self.players[j]
+    def play(self, player1, player2, game):
+        flag = False
+        if game.get_turn() == 2:
+            flag = True
         playing = True
         while playing:
             game.place(player1.chooseAction(game.get_board()))
             winner = game.get_win()
             if winner is None:
-                game.place(player2.chooseAction(game.get_board()))
+                #game.place(player2.chooseAction(game.get_board()))
+                game.place(player2.chooseAction()[0])
                 winner = game.get_win()
                 if winner is not None:
                     playing = False
             else:
                 playing = False
-        if winner == 0:
-            return -1
-        elif winner == 1:
-            return i
-        else:
-            return j
 
+        if winner != 0 and flag:
+            winner = 3 - winner
+        return winner
+
+    """
     def fitness(self):
         scores = []
         total = sum([p.getScore() for p in self.players])
         for player in self.players:
             scores.append(player.getScore() / total)
+        return scores
+    """
+
+    def fitness(self):
+        scores = []
+        for player in self.players:
+            player_score = 1
+            for i in range(10):
+                game = Connect4Game()
+                winner = self.play(player, MinimaxPlayer(3 - game.get_turn(), game.board), game)
+                if winner == 0:
+                    player_score += 50
+                elif winner == 1:
+                    player_score += 100
+            scores.append(player_score)
+        total = sum(scores)
+        for i in range(len(scores)):
+            scores[i] = scores[i]/total
         return scores
 
     def nextGen(self):
@@ -91,8 +113,9 @@ class Generation:
             children[1].neural_network.setWeights(i, new_chromosomes2)
         return children
 
+"""
 for j in range(10):
-    gen = Generation(20, 10, 10)
+    gen = Generation(20, 100, 1)
     x = 0
 
     for i in range(1000):
@@ -109,7 +132,7 @@ for j in range(10):
             game.place(action)
             winner = game.get_win()
             if winner is None:
-                game.place(player2.AIalgorithm()[0])
+                game.place(player2.chooseAction()[0])
                 winner = game.get_win()
                 if winner is not None:
                     playing = False
@@ -127,6 +150,7 @@ for j in range(10):
 
 
 """
+gen = Generation(20, 100, 1)
 player = gen.players[0]
 game = Connect4Game()
 game.reset_game()
@@ -148,4 +172,3 @@ while running:
                 game.place(player_a_choice)
             else:
                 game.reset_game()
-"""
