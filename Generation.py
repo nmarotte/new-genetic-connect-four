@@ -1,6 +1,7 @@
 import pygame
 
-from NeuralNetwork import NeuralNetwork, NeuralNetworkPlayer, MinimaxPlayer
+from NeuralNetwork import NeuralNetwork, NeuralNetworkPlayer
+from MinMax import MinimaxPlayer
 import numpy as np
 from game import Connect4Game, Connect4Viewer, SQUARE_SIZE
 from pprint import pprint
