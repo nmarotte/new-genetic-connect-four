@@ -50,7 +50,7 @@ class MinMaxPlayer(Player):
         if depth is None:
             depth = MinMaxPlayer.difficulty
         if depth == 0:
-            return -1, 0
+            return None, 0
         best_score = -float('inf') if maxi else float('inf')
         player_id = self.player_turn_id if maxi else 1 if self.player_turn_id == 2 else 2  # current player if max, else opposite
 
@@ -86,7 +86,7 @@ class MinMaxPlayer(Player):
 
 
 if __name__ == '__main__':
-    MinMaxPlayer.difficulty = 10
+    MinMaxPlayer.difficulty = 4
     player = MinMaxPlayer(2)
     game = Connect4Game()
     game.reset_game()

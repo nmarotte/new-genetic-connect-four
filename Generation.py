@@ -47,7 +47,7 @@ class Generation:
 
 
 if __name__ == '__main__':
-    MinMaxPlayer.difficulty = 16
+    MinMaxPlayer.difficulty = 4
     gen = Generation(20, 40, 1)
     best_player = None
     max_fitness = 0
