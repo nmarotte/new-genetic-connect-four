@@ -39,7 +39,7 @@ class MinMaxPlayer(Player):
         """
         Algorithme AI
         """
-        return self.min_max_search(game)
+        return self.min_max_search(game)[0]
 
     def min_max_search(self, game, depth=2, maxi=True) -> tuple[int, int]:
         if depth == 0:
