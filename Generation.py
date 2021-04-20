@@ -5,10 +5,6 @@ from MinMax import MinimaxPlayer
 import numpy as np
 from game import Connect4Game, Connect4Viewer, SQUARE_SIZE
 
-INPUT_LAYER = 126
-OUTPUT_LAYER = 7
-INTERMEDIATE_LAYERS = (126, 126)
-
 
 class Generation:
 
@@ -16,7 +12,7 @@ class Generation:
         self.nb_players = nb_players
         self.nb_generations = nb_generations
         self.nb_games = nb_games
-        self.players = [NeuralNetworkPlayer(NeuralNetwork(INPUT_LAYER, OUTPUT_LAYER, INTERMEDIATE_LAYERS)) for _ in
+        self.players = [NeuralNetworkPlayer(NeuralNetwork()) for _ in
                         range(self.nb_players)]
         self.tournament()
 
@@ -98,8 +94,7 @@ class Generation:
         self.players = newGen
 
     def reproduce(self, parents):
-        children = [NeuralNetworkPlayer(NeuralNetwork(INPUT_LAYER, OUTPUT_LAYER, INTERMEDIATE_LAYERS)),
-                    NeuralNetworkPlayer(NeuralNetwork(INPUT_LAYER, OUTPUT_LAYER, INTERMEDIATE_LAYERS))]
+        children = [NeuralNetworkPlayer(),NeuralNetworkPlayer()]
         for i in range(len(parents[0].neural_network.weights)):
             shape = parents[0].neural_network.weights[i].shape
             chromosomes1 = parents[0].neural_network.weights[i].flatten()

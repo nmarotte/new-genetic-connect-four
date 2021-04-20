@@ -1,8 +1,12 @@
 import numpy as np
 
-class NeuralNetwork:
+INPUT_LAYER = 126
+OUTPUT_LAYER = 7
+INTERMEDIATE_LAYERS = (126, 126)
 
-    def __init__(self, n_input, n_output, n_intermediate=()):
+
+class NeuralNetwork:
+    def __init__(self, n_input=INPUT_LAYER, n_output=OUTPUT_LAYER, n_intermediate=INTERMEDIATE_LAYERS):
         self.weights = []
         layers = [n_input]
         if isinstance(n_intermediate, int):
@@ -34,7 +38,7 @@ class NeuralNetwork:
 
 class NeuralNetworkPlayer:
 
-    def __init__(self, neural_network):
+    def __init__(self, neural_network = NeuralNetwork()):
         self.neural_network = neural_network
         self.score = 0
 
