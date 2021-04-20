@@ -43,9 +43,6 @@ class NeuralNetworkPlayer(Player):
         for i in range(10):
             game = Connect4Game()
             winner = self.play_against(MinMaxPlayer(3 - game.get_turn()), game)
-            if winner == 1:
-                print(game.board)
-                input()
             if winner == 0:
                 player_score += 50
             elif winner == 1:

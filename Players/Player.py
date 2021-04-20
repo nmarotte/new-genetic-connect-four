@@ -17,18 +17,16 @@ class Player:
         pass
 
     def play_against(self, opponent: Player, game: Connect4Game):
-        playing = True
-        while playing:
-            game.place(self.choose_action(game))
-            winner = game.get_win()
-            if winner is None:
-                game.place(opponent.choose_action(game)[0])
-                winner = game.get_win()
-                if winner is not None:
-                    playing = False
+        my_turn = False
+        winner = game.get_win()
+        while winner is None:
+            if my_turn:
+                game.place(self.choose_action(game))
             else:
-                playing = False
+                game.place(opponent.choose_action(game)[0])
 
-        if winner != 0 and game.get_turn() == 2:
-            winner = 3 - winner
+            winner = game.get_win()
+
+        # if winner != 0 and game.get_turn() == 2:
+        #     winner = 3 - winner
         return winner
