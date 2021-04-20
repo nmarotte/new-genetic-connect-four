@@ -1,7 +1,7 @@
 import progressbar
 import numpy as np
 
-from NeuralNetworkPlayer import NeuralNetworkPlayer
+from Players.NeuralNetworkPlayer import NeuralNetworkPlayer
 
 
 class Generation:
@@ -14,7 +14,8 @@ class Generation:
 
     def tournament(self):
         # Progress bar
-        bar = progressbar.ProgressBar(maxval=self.nb_generations)
+        bar = progressbar.ProgressBar(max_value=self.nb_generations)
+        bar.start()
         for generation in range(self.nb_generations):
             # compute the fitness of the current generation
             fitness = self.fitness()
@@ -25,16 +26,24 @@ class Generation:
             for i in np.where(new_gen == 0)[0]:
                 parents = np.random.choice(self.players, size=2, replace=False, p=fitness)
                 children = NeuralNetworkPlayer.reproduce(parents)
-                new_gen[i:i+len(children)] = children
-            bar.next()
+                if i+len(children) < self.nb_players:
+                    new_gen[i:i+len(children)] = children
+                else:
+                    new_gen[i:i+len(children)-1] = children[0]
+                    # todo find a better alternative to when we only need
+                    #  one more child
+            bar.update(generation)
 
     def fitness(self):
         """
-        Compute the fitness of each player of the generation by making him play
-        10 times against a MinMax player
+        Compute the fitness of each player of the generation
         :return:
         """
         scores = np.zeros(len(self.players))
         for i, player in enumerate(self.players):
             scores[i] = player.compute_fitness()
-        return scores/sum(scores)
+        return scores/sum(scores)  # makes the total equals to 1
+
+
+if __name__ == '__main__':
+    gen = Generation(20, 100, 1)
