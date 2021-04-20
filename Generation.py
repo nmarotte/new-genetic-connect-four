@@ -39,9 +39,7 @@ class Generation:
         Compute the fitness of each player of the generation
         :return:
         """
-        scores = np.zeros(len(self.players))
-        for i, player in enumerate(self.players):
-            scores[i] = player.compute_fitness()
+        scores = np.array([player.compute_fitness() for player in self.players])
         return scores/sum(scores)  # makes the total equals to 1
 
 
