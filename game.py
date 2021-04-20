@@ -1,9 +1,10 @@
+import enum
+import random
+from copy import deepcopy
+
+import numpy as np
 import pygame
 import pygame.gfxdraw
-import random
-import enum
-from copy import deepcopy
-import numpy as np
 
 # Graphical size settings
 SQUARE_SIZE = 100
@@ -236,7 +237,8 @@ class Connect4Game(Observable):
 		Computes the list of possible move given the current board config
 		:return: list containing all the indices of which the column is not full
 		"""
-        return [i for i, column in enumerate(self.board) if column[-1] == 0]
+        res = [i for i, column in enumerate(self.board) if column[-1] == 0]
+        return res
 
 
 class Connect4Viewer(Observer):
@@ -254,8 +256,8 @@ class Connect4Viewer(Observer):
 		Initialises the view window
 		"""
         pygame.init()
-        icon = pygame.image.load("icon.png")
-        pygame.display.set_icon(icon)
+        # icon = pygame.image.load("icon.png")
+        # pygame.display.set_icon(icon)
         pygame.display.set_caption("Connect Four")
         self._font = pygame.font.SysFont(None, 80)
         self._screen = pygame.display.set_mode(

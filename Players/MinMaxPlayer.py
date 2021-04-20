@@ -1,12 +1,16 @@
 import random
 
+import pygame
+
 from Players.Player import Player
 import numpy as np
 
-from game import Connect4Game
+from game import Connect4Game, Connect4Viewer, SQUARE_SIZE
 
 
 class MinMaxPlayer(Player):
+    difficulty = 2
+
     def __init__(self, player_turn_id=None):
         super().__init__(player_turn_id)
 
@@ -30,7 +34,7 @@ class MinMaxPlayer(Player):
     def undo_drop_token(self, game: Connect4Game):
         move = self.last_moves.pop()
         try:
-            last_token_dropped_index = game.board[move].index(0)  # Element if column is not full
+            last_token_dropped_index = game.board[move].index(0)-1  # Element if column is not full
         except ValueError:
             last_token_dropped_index = len(game.board[move]) - 1  # Last element if column is full
         game.board[move][last_token_dropped_index] = 0
@@ -41,7 +45,10 @@ class MinMaxPlayer(Player):
         """
         return self.min_max_search(game)[0]
 
-    def min_max_search(self, game, depth=2, maxi=True) -> tuple[int, int]:
+    def min_max_search(self, game, depth=None, maxi=True) -> tuple[int, int]:
+        # Default depth
+        if depth is None:
+            depth = MinMaxPlayer.difficulty
         if depth == 0:
             return -1, 0
         best_score = -float('inf') if maxi else float('inf')
@@ -49,14 +56,12 @@ class MinMaxPlayer(Player):
 
         best_move = []
         moves_possible = game.get_possible_moves()
+
         for move in moves_possible:
+            pos = move, game.board[move].index(0)-1
             self.drop_token(game, move, player_id, log_moves=True)  # Puts token
-            try:
-                pos = move, game.board[move].index(0)
-            except ValueError:  # Happens when no 0 in the column
-                pos = move, -1
             winner = game.check_win(pos)  # we suppose that the first time it's going to be empty
-            if winner is None:  # No winner yet
+            if winner == 0:  # No winner yet
                 score = self.min_max_search(game, depth - 1, not maxi)[1]  # Recursive
             else:
                 score = 1 if winner == self.player_turn_id else -1  # todo behavior for draw is same as losing
@@ -77,5 +82,29 @@ class MinMaxPlayer(Player):
                     best_move = [(move, score)]
             else:
                 best_move.append((move, score))
-
         return random.choice(best_move)
+
+
+if __name__ == '__main__':
+    MinMaxPlayer.difficulty = 10
+    player = MinMaxPlayer(2)
+    game = Connect4Game()
+    game.reset_game()
+    view = Connect4Viewer(game=game)
+    view.initialize()
+    running = True
+    while running:
+        for i, event in enumerate(pygame.event.get()):
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                if game.get_win() is None:
+                    placement = game.place(pygame.mouse.get_pos()[0] // SQUARE_SIZE)
+                    if placement is None:  # Still player's turn if placement fails
+                        continue
+                    if game.get_win() is not None:
+                        game.reset_game()
+                    player_a_choice = player.choose_action(game)
+                    game.place(player_a_choice)
+                else:
+                    game.reset_game()

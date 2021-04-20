@@ -1,14 +1,17 @@
 import progressbar
 import numpy as np
+import pygame
 
-from Players.NeuralNetworkPlayer import NeuralNetworkPlayer
+from Players.NeuralNetworkPlayer import NeuralNetworkPlayer, MinMaxPlayer
+from game import Connect4Game, SQUARE_SIZE, Connect4Viewer
 
 
 class Generation:
-    def __init__(self, nb_players, nb_generations, nb_games):
+    def __init__(self, nb_players, nb_generations, nb_games, difficulty=2):
         self.nb_players = nb_players
         self.nb_generations = nb_generations
         self.nb_games = nb_games
+        self.difficulty = difficulty
         self.players = [NeuralNetworkPlayer() for _ in range(self.nb_players)]
         self.tournament()
 
@@ -39,9 +42,38 @@ class Generation:
         Compute the fitness of each player of the generation
         :return:
         """
-        scores = np.array([player.compute_fitness() for player in self.players])
+        scores = np.array([p.compute_fitness() for p in self.players])
         return scores/sum(scores)  # makes the total equals to 1
 
 
 if __name__ == '__main__':
-    gen = Generation(20, 100, 1)
+    MinMaxPlayer.difficulty = 16
+    gen = Generation(20, 40, 1)
+    best_player = None
+    max_fitness = 0
+    for player in gen.players:
+        fitness = player.compute_fitness()
+        if fitness > max_fitness:
+            max_fitness = fitness
+            best_player = player
+    player = best_player
+    game = Connect4Game()
+    game.reset_game()
+    view = Connect4Viewer(game=game)
+    view.initialize()
+    running = True
+    while running:
+        for i, event in enumerate(pygame.event.get()):
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                if game.get_win() is None:
+                    placement = game.place(pygame.mouse.get_pos()[0] // SQUARE_SIZE)
+                    if placement is None:  # Still player's turn if placement fails
+                        continue
+                    if game.get_win() is not None:
+                        game.reset_game()
+                    player_a_choice = player.choose_action(game)
+                    game.place(player_a_choice)
+                else:
+                    game.reset_game()
