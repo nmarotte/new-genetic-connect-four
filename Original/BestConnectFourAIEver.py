@@ -1,9 +1,8 @@
-import random
 import numpy as np
 
 import pygame
 
-from game import Connect4Game, Connect4Viewer, SQUARE_SIZE
+from Old.game import Connect4Game, Connect4Viewer, SQUARE_SIZE
 from utils import transform_board
 
 nb_neurons_first_layer = np.zeros((6, 7), dtype=np.float64)  # 7 * 6 nb rows * nb columns
