@@ -42,10 +42,11 @@ class NeuralNetworkPlayer(Player):
         player_score = 1  # Since this will be used for probabilities, no one should have a score of 0
         for i in range(10):
             game = Connect4Game()
-            winner = self.play_against(MinMaxPlayer(player_turn_id=3 - game.get_turn()), game)
-            if winner == 0:
+            opponent = MinMaxPlayer(player_turn_id=3 - game.get_turn())
+            winner = self.play_against(opponent, game)
+            if winner == 0:  # Tie
                 player_score += 50
-            elif winner == 1:
+            elif winner == self.player_turn_id:  # Won
                 player_score += 100
         return player_score
 
