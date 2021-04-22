@@ -28,6 +28,7 @@ class Generation:
                 parents = np.random.choice(self.players, size=2, replace=False, p=fitness)
                 children = NeuralNetworkPlayer.reproduce(parents)
                 new_gen[i:i+len(children)] = children
+            new_gen[np.where(new_gen == 0)[0][0]] = self.players[np.argmax(fitness)]
             survivors = np.random.choice(self.players, size=len(np.where(new_gen == 0)[0]), replace=False, p=fitness)
             new_gen[np.where(new_gen == 0)[0]] = survivors
 
@@ -39,12 +40,14 @@ class Generation:
         :return:
         """
         scores = np.array([p.compute_fitness() for p in self.players])
+        scores_2 = np.array([10 if p.play_against(p2) == p.player_turn_id else 0 for p, p2 in zip(self.players, np.random.choice(self.players, size=len(self.players)))])
+        scores = scores+scores_2
         return scores/sum(scores)  # makes the total equals to 1
 
 
 if __name__ == '__main__':
     MinMaxPlayer.difficulty = 2
-    gen = Generation(20, 10, 1)
+    gen = Generation(20, 100, 1)
     best_player = None
     max_fitness = 0
     for player in gen.players:

@@ -9,7 +9,7 @@ from game import Connect4Game, Connect4Viewer, SQUARE_SIZE
 
 
 class MinMaxPlayer(Player):
-    difficulty = 2
+    difficulty = 4
 
     def __init__(self, player_turn_id=None):
         super().__init__(player_turn_id)

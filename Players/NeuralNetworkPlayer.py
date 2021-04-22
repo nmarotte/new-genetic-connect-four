@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 
 from Players.MinMaxPlayer import MinMaxPlayer
@@ -10,7 +12,7 @@ OUTPUT_LAYER = 7
 
 
 class NeuralNetworkPlayer(Player):
-    def __init__(self, player_turn_id=None, n_input=INPUT_LAYER, n_output=OUTPUT_LAYER,
+    def __init__(self, player_turn_id=random.randint(1,2), n_input=INPUT_LAYER, n_output=OUTPUT_LAYER,
                  n_intermediate=INTERMEDIATE_LAYERS):
         super().__init__(player_turn_id)
         self.weights = []

@@ -16,18 +16,18 @@ class Player:
     def choose_action(self, game: Connect4Game) -> tuple[int, int]:
         pass
 
-    def play_against(self, opponent: Player, game: Connect4Game):
-        my_turn = False
+    def play_against(self, opponent: Player, game: Connect4Game = Connect4Game()):
+        if self.player_turn_id == opponent.player_turn_id:
+            self.player_turn_id = 3 - self.player_turn_id
         yellow_goes_first = game.get_turn() == 1
         winner = game.get_win()
         while winner is None:
-            if my_turn:
+            if game.get_turn() == self.player_turn_id:
                 game.place(self.choose_action(game))
             else:
                 game.place(opponent.choose_action(game))
 
             winner = game.get_win()
-            my_turn = not my_turn
 
         if winner != 0 and not yellow_goes_first:
             winner = 3 - winner
