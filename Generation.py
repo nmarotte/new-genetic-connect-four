@@ -24,17 +24,13 @@ class Generation:
             fitness = self.fitness()
             new_gen = np.zeros_like(self.players)  # Empty generation
             # Add 50 % of the previous generation
-            survivors = np.random.choice(self.players, size=len(self.players) // 2, replace=False, p=fitness)
-            new_gen[0:len(survivors)] = survivors
-            for i in np.where(new_gen == 0)[0]:
+            for i in range(len(self.players) // 4):
                 parents = np.random.choice(self.players, size=2, replace=False, p=fitness)
                 children = NeuralNetworkPlayer.reproduce(parents)
-                if i+len(children) < self.nb_players:
-                    new_gen[i:i+len(children)] = children
-                else:
-                    new_gen[i:i+len(children)-1] = children[0]
-                    # todo find a better alternative to when we only need
-                    #  one more child
+                new_gen[i:i+len(children)] = children
+            survivors = np.random.choice(self.players, size=len(np.where(new_gen == 0)[0]), replace=False, p=fitness)
+            new_gen[np.where(new_gen == 0)[0]] = survivors
+
             bar.update(generation)
 
     def fitness(self):

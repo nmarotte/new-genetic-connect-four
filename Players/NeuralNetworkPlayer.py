@@ -5,8 +5,8 @@ from Players.Player import Player
 from game import Connect4Game
 
 INPUT_LAYER = 126
-OUTPUT_LAYER = 7
 INTERMEDIATE_LAYERS = (126, 126)
+OUTPUT_LAYER = 7
 
 
 class NeuralNetworkPlayer(Player):
