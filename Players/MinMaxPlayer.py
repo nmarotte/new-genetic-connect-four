@@ -14,81 +14,6 @@ class MinMaxPlayer(Player):
     def __init__(self, player_turn_id=None):
         super().__init__(player_turn_id)
 
-    def check_win(self, board, pos):
-        """
-        Checks for win/draw from newly added disc
-        :param pos: position from which to check the win
-        :return: player number if a win occurs, 0 if a draw occurs, None otherwise
-        """
-        rows = 6
-        cols = 7
-
-        i = 0
-        while i < 6 and board[pos][i] != 0:
-            i += 1
-
-        c = pos
-        r = i - 1
-        player = board[c][r]
-
-        min_col = max(c - 3, 0)
-        max_col = min(c + 3, cols - 1)
-        min_row = max(r - 3, 0)
-        max_row = min(r + 3, rows - 1)
-
-        # Horizontal check
-        count = 0
-        for ci in range(min_col, max_col + 1):
-            if board[ci][r] == player:
-                count += 1
-            else:
-                count = 0
-            if count == 4:
-                won = player
-                return [won]
-
-        # Vertical check
-        count = 0
-        for ri in range(min_row, max_row + 1):
-            if board[c][ri] == player:
-                count += 1
-            else:
-                count = 0
-            if count == 4:
-                won = player
-                return [won]
-
-        count1 = 0
-        count2 = 0
-        # Diagonal check
-        for i in range(-3, 4):
-            # bottom-left -> top-right
-            if 0 <= c + i < cols and 0 <= r + i < rows:
-                if board[c + i][r + i] == player:
-                    count1 += 1
-                else:
-                    count1 = 0
-                if count1 == 4:
-                    won = player
-                    return [won]
-            # bottom-right -> top-let
-            if 0 <= c + i < cols and 0 <= r - i < rows:
-                if board[c + i][r - i] == player:
-                    count2 += 1
-                else:
-                    count2 = 0
-                if count2 == 4:
-                    won = player
-                    return [won]
-
-        # Draw check
-        if sum([x.count(0) for x in board]) == 0:
-            won = 0
-            return [1, 2]
-
-        won = []
-        return won
-
     def drop_token(self, game: Connect4Game, column_number, player_id, log_moves):
         """
         Make the player drop his token into the given column
@@ -118,7 +43,7 @@ class MinMaxPlayer(Player):
         """
         Algorithme AI
         """
-        return self.min_max_search(game)[0]
+        return self.min_max_search(game.copy_state())[0]
 
     def min_max_search(self, game, depth=None, maxi=True) -> tuple[int, int]:
         # Default depth
@@ -133,13 +58,13 @@ class MinMaxPlayer(Player):
         moves_possible = game.get_possible_moves()
 
         for move in moves_possible:
-            pos = move, game.board[move].index(0) - 1
+            pos = move, game.board[move].index(0)
             self.drop_token(game, move, player_id, log_moves=True)  # Puts token
-            winners = self.check_win(game.board, move)  # we suppose that the first time it's going to be empty
-            if len(winners) == 0:  # No winner yet
+            winner = game.check_win(pos)  # we suppose that the first time it's going to be empty
+            if winner is None:  # No winner yet
                 score = self.min_max_search(game, depth - 1, not maxi)[1]  # Recursive
-            else:
-                score = 1 if winners.pop() == self.player_turn_id else -1  # todo behavior for draw is same as losing
+            else:  # 1 if I won, else -1
+                score = 1 if winner == self.player_turn_id else -1  # todo behavior for draw is same as losing
 
             self.undo_drop_token(game)  # Remove token
 
