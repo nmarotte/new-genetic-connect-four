@@ -150,14 +150,17 @@ for j in range(10):
 
 
 """
+"""
 gen = Generation(20, 100, 1)
 player = gen.players[0]
+"""
 game = Connect4Game()
 game.reset_game()
 view = Connect4Viewer(game=game)
 view.initialize()
 running = True
 while running:
+    player = MinimaxPlayer(3 - game.get_turn(), game.board)
     for i, event in enumerate(pygame.event.get()):
         if event.type == pygame.QUIT:
             running = False
@@ -168,7 +171,7 @@ while running:
                     continue
                 if game.get_win() is not None:
                     game.reset_game()
-                player_a_choice = player.chooseAction(game.get_board())
+                player_a_choice = player.chooseAction()[0]
                 game.place(player_a_choice)
             else:
                 game.reset_game()
