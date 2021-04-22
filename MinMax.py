@@ -1,5 +1,10 @@
 from random import choice
 
+import pygame
+
+from game import Connect4Game, Connect4Viewer, SQUARE_SIZE
+
+
 class MinimaxPlayer:
 
     def __init__(self, player_id, board):
@@ -157,3 +162,27 @@ class MinimaxPlayer:
 
         won = []
         return won
+
+if __name__ == '__main__':
+    game = Connect4Game()
+    player = MinimaxPlayer(2, game.board)
+    game.reset_game()
+    view = Connect4Viewer(game=game)
+    view.initialize()
+    running = True
+    while running:
+        for i, event in enumerate(pygame.event.get()):
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                if game.get_win() is None:
+                    placement = game.place(pygame.mouse.get_pos()[0] // SQUARE_SIZE)
+                    if placement is None:  # Still player's turn if placement fails
+                        continue
+                    if game.get_win() is not None:
+                        game.reset_game()
+                    player_a_choice = player.chooseAction(profondeur=4)
+                    print(player_a_choice)
+                    game.place(player_a_choice[0])
+                else:
+                    game.reset_game()
