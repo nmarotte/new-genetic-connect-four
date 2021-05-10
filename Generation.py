@@ -26,11 +26,23 @@ class Generation:
             # Add 50 % of the previous generation
             for i in range(len(self.players) // 4):
                 parents = np.random.choice(self.players, size=2, replace=False, p=fitness)
-                children = NeuralNetworkPlayer.reproduce(parents)
-                new_gen[i:i+len(children)] = children
+                children = NeuralNetworkPlayer.reproduce_new(parents)
+                new_gen[i:i + len(children)] = children
             new_gen[np.where(new_gen == 0)[0][0]] = self.players[np.argmax(fitness)]
             survivors = np.random.choice(self.players, size=len(np.where(new_gen == 0)[0]), replace=False, p=fitness)
             new_gen[np.where(new_gen == 0)[0]] = survivors
+
+            bar.update(generation)
+
+    def tournament_new(self):
+        # Progress bar
+        bar = progressbar.ProgressBar(max_value=self.nb_players * self.nb_generations)
+        bar.start()
+        for generation in range(self.nb_players * self.nb_generations):
+            player_a, player_b = np.random.choice(self.players, replace=False, size=2)
+            winner = player_a.play_against(player_b)
+            self.players.remove(player_b if winner == player_a.player_turn_id else player_a)
+            self.players.append(NeuralNetworkPlayer())
 
             bar.update(generation)
 
@@ -40,9 +52,10 @@ class Generation:
         :return:
         """
         scores = np.array([p.compute_fitness() for p in self.players])
-        scores_2 = np.array([10 if p.play_against(p2) == p.player_turn_id else 0 for p, p2 in zip(self.players, np.random.choice(self.players, size=len(self.players)))])
-        scores = scores+scores_2
-        return scores/sum(scores)  # makes the total equals to 1
+        scores_2 = np.array([10 if p.play_against(p2) == p.player_turn_id else 0 for p, p2 in
+                             zip(self.players, np.random.choice(self.players, size=len(self.players)))])
+        scores = scores + scores_2
+        return scores / sum(scores)  # makes the total equals to 1
 
 
 if __name__ == '__main__':

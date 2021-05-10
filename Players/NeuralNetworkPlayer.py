@@ -78,3 +78,20 @@ class NeuralNetworkPlayer(Player):
             children[0].weights[i] = new_chromosomes1
             children[1].weights[i] = new_chromosomes2
         return children
+
+    @staticmethod
+    def reproduce_new(parents):
+        parent_a, parent_b = parents
+
+        children = [NeuralNetworkPlayer(), NeuralNetworkPlayer()]
+        for i in range(len(parent_a.weights)):
+            shape = parent_a.weights[i].shape
+
+            chromosomes1 = parent_a.weights[i].flatten()
+            chromosomes2 = parent_b.weights[i].flatten()
+            choice = np.random.randint(0, 1, size=len(chromosomes1))
+            new_chromosomes1 = np.where(choice == 0, chromosomes1, chromosomes2)
+            new_chromosomes2 = np.where(choice == 1, chromosomes1, chromosomes2)
+            children[0].weights[i] = new_chromosomes1
+            children[1].weights[i] = new_chromosomes2
+        return children
