@@ -58,9 +58,20 @@ class Connect4Game(Observable):
         self._rows = rows
         self._cols = cols
         self.board = None
+        self.history = ""
         self._turn = None
         self._won = None
         self.reset_game()
+
+    @classmethod
+    def from_history(cls, history):
+        board = cls()
+        for play in history:
+            column = ord(play.lower()) - ord('a')  # 0 if A/a, 6 if G/g
+            turn_id = 1 if play.islower() else 2
+            board._turn = turn_id
+            board.place(column)
+        return board
 
     def transform_board(self):
         matrix = np.zeros((7, 6, 3), dtype=bool)
@@ -92,6 +103,8 @@ class Connect4Game(Observable):
         for r in range(self._rows):
             if self.board[c][r] == 0:
                 self.board[c][r] = self._turn
+                turn_history = chr(ord("a") + c)
+                self.history += turn_history if self._turn == 1 else turn_history.upper()
 
                 if self._turn == 1:
                     self._turn = 2
