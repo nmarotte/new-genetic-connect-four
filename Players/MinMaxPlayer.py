@@ -39,11 +39,11 @@ class MinMaxPlayer(Player):
             last_token_dropped_index = len(game.board[move]) - 1  # Last element if column is full
         game.board[move][last_token_dropped_index] = 0
 
-    def choose_action(self, game):
+    def choose_action(self, game, difficulty=2):
         """
         Algorithme AI
         """
-        return self.min_max_search(game.copy_state())[0]
+        return self.min_max_search(game.copy_state(), depth=difficulty)[0]
 
     def min_max_search(self, game, depth=None, maxi=True) -> tuple[int, int]:
         # Default depth
@@ -103,7 +103,7 @@ if __name__ == '__main__':
                         continue
                     if game.get_win() is not None:
                         game.reset_game()
-                    player_a_choice = player.choose_action(game)
+                    player_a_choice = player.choose_action(game, MinMaxPlayer.difficulty)
                     game.place(player_a_choice)
                 else:
                     game.reset_game()

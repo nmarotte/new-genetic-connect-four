@@ -2,6 +2,7 @@ from __future__ import annotations  # for typing the enclosing class
 
 import abc
 
+import Players.MinMaxPlayer as MinMax
 from game import Connect4Game
 
 
@@ -32,3 +33,14 @@ class Player:
         if winner != 0 and not yellow_goes_first:
             winner = 3 - winner
         return winner
+
+    def compute_fitness(self):
+        game = Connect4Game()
+        adversary = MinMax.MinMaxPlayer(3 - game.get_turn())
+        score = 1
+        for _ in range(10):
+            winner = self.play_against(adversary, game)
+            if winner == self.player_turn_id:
+                score += 1
+        return score
+

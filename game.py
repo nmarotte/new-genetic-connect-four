@@ -71,6 +71,7 @@ class Connect4Game(Observable):
             turn_id = 1 if play.islower() else 2
             board._turn = turn_id
             board.place(column)
+        board.history += str(board.get_win())
         return board
 
     def transform_board(self):
@@ -90,6 +91,7 @@ class Connect4Game(Observable):
 		Resets the game state (board and variables)
 		"""
         self.board = [[0 for _ in range(self._rows)] for _ in range(self._cols)]
+        self.history = ""
         self._turn = random.randint(1, 2)
         self._won = None
         self.notify(Event.GAME_RESET)
@@ -112,7 +114,9 @@ class Connect4Game(Observable):
                     self._turn = 1
 
                 self.notify(Event.PIECE_PLACED, (c, r))
-                self.check_win((c, r))
+                winner = self.check_win((c, r))
+                if winner is not None:
+                    self.history += str(self.get_win())
                 return c, r
         return None
 

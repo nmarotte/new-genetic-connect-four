@@ -2,6 +2,7 @@ import progressbar
 import numpy as np
 import pygame
 
+from Players.CombinatorialPlayer import CombinatorialPlayer
 from Players.NeuralNetworkPlayer import NeuralNetworkPlayer, MinMaxPlayer
 from game import Connect4Game, SQUARE_SIZE, Connect4Viewer
 
@@ -12,7 +13,7 @@ class Generation:
         self.nb_generations = nb_generations
         self.nb_games = nb_games
         self.difficulty = difficulty
-        self.players = [NeuralNetworkPlayer() for _ in range(self.nb_players)]
+        self.players = [CombinatorialPlayer(24) for _ in range(self.nb_players)]
         self.tournament()
 
     def tournament(self):
@@ -26,7 +27,7 @@ class Generation:
             # Add 50 % of the previous generation
             for i in range(len(self.players) // 4):
                 parents = np.random.choice(self.players, size=2, replace=False, p=fitness)
-                children = NeuralNetworkPlayer.reproduce_new(parents)
+                children = CombinatorialPlayer.reproduce(parents)
                 new_gen[i:i + len(children)] = children
             new_gen[np.where(new_gen == 0)[0][0]] = self.players[np.argmax(fitness)]
             survivors = np.random.choice(self.players, size=len(np.where(new_gen == 0)[0]), replace=False, p=fitness)
@@ -42,7 +43,7 @@ class Generation:
             player_a, player_b = np.random.choice(self.players, replace=False, size=2)
             winner = player_a.play_against(player_b)
             self.players.remove(player_b if winner == player_a.player_turn_id else player_a)
-            self.players.append(NeuralNetworkPlayer())
+            self.players.append(CombinatorialPlayer(24))
 
             bar.update(generation)
 
@@ -69,6 +70,7 @@ if __name__ == '__main__':
             max_fitness = fitness
             best_player = player
     player = best_player
+    print(max_fitness)
     game = Connect4Game()
     game.reset_game()
     view = Connect4Viewer(game=game)
