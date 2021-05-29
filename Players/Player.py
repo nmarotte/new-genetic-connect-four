@@ -1,8 +1,6 @@
 from __future__ import annotations  # for typing the enclosing class
 
 import abc
-
-import Players.MinMaxPlayer as MinMax
 from game import Connect4Game
 
 
@@ -14,10 +12,22 @@ class Player:
         self.last_moves = []
 
     @abc.abstractmethod
-    def choose_action(self, game: Connect4Game) -> tuple[int, int]:
-        pass
+    def choose_action(self, game: Connect4Game) -> int:
+        """
+        The method to choose an action that returns a number in the interval [0, nb_col-1]
+        :param game: the current Connect-4 game
+        :return:
+        """
 
     def play_against(self, opponent: Player, game: Connect4Game = Connect4Game()):
+        """
+        Make the agent play against another player on the given game or a new game.
+        If both player have the same game turn id, self will change its game turn id
+        Returns the winner
+        :param opponent: another player
+        :param game: The current game, if nothing specified then a new game
+        :return: the winner (0 for draw, 1 for player 1, 2 for player 2
+        """
         if self.player_turn_id == opponent.player_turn_id:
             self.player_turn_id = 3 - self.player_turn_id
         yellow_goes_first = game.get_turn() == 1
@@ -33,14 +43,3 @@ class Player:
         if winner != 0 and not yellow_goes_first:
             winner = 3 - winner
         return winner
-
-    def compute_fitness(self):
-        game = Connect4Game()
-        adversary = MinMax.MinMaxPlayer(3 - game.get_turn())
-        score = 1
-        for _ in range(10):
-            winner = self.play_against(adversary, game)
-            if winner == self.player_turn_id:
-                score += 1
-        return score
-

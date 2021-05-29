@@ -2,13 +2,11 @@ import random
 
 import pygame
 
-from Players.Player import Player
-import numpy as np
-
+import Players.Player as Player
 from game import Connect4Game, Connect4Viewer, SQUARE_SIZE
 
 
-class MinMaxPlayer(Player):
+class MinMaxPlayer(Player.Player):
     difficulty = 4
 
     def __init__(self, player_turn_id=None):

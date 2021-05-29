@@ -2,9 +2,10 @@ import progressbar
 import numpy as np
 import pygame
 
-from Players.CombinatorialPlayer import CombinatorialPlayer
-from Players.NeuralNetworkPlayer import NeuralNetworkPlayer, MinMaxPlayer
+import Players.CombinatorialPlayer as CombinatorialPlayer
+import Players.MinMaxPlayer as MinMaxPlayer
 from game import Connect4Game, SQUARE_SIZE, Connect4Viewer
+from utils import compute_fitness
 
 
 class Generation:
@@ -13,7 +14,7 @@ class Generation:
         self.nb_generations = nb_generations
         self.nb_games = nb_games
         self.difficulty = difficulty
-        self.players = [CombinatorialPlayer(24) for _ in range(self.nb_players)]
+        self.players = [CombinatorialPlayer.CombinatorialPlayer(24) for _ in range(self.nb_players)]
         self.tournament()
 
     def tournament(self):
@@ -27,7 +28,7 @@ class Generation:
             # Add 50 % of the previous generation
             for i in range(len(self.players) // 4):
                 parents = np.random.choice(self.players, size=2, replace=False, p=fitness)
-                children = CombinatorialPlayer.reproduce(parents)
+                children = CombinatorialPlayer.CombinatorialPlayer.reproduce(parents)
                 new_gen[i:i + len(children)] = children
             new_gen[np.where(new_gen == 0)[0][0]] = self.players[np.argmax(fitness)]
             survivors = np.random.choice(self.players, size=len(np.where(new_gen == 0)[0]), replace=False, p=fitness)
@@ -43,7 +44,7 @@ class Generation:
             player_a, player_b = np.random.choice(self.players, replace=False, size=2)
             winner = player_a.play_against(player_b)
             self.players.remove(player_b if winner == player_a.player_turn_id else player_a)
-            self.players.append(CombinatorialPlayer(24))
+            self.players.append(CombinatorialPlayer.CombinatorialPlayer(24))
 
             bar.update(generation)
 
@@ -52,20 +53,21 @@ class Generation:
         Compute the fitness of each player of the generation
         :return:
         """
-        scores = np.array([p.compute_fitness() for p in self.players])
+        scores = np.array([compute_fitness(p) for p in self.players])
         scores_2 = np.array([10 if p.play_against(p2) == p.player_turn_id else 0 for p, p2 in
                              zip(self.players, np.random.choice(self.players, size=len(self.players)))])
         scores = scores + scores_2
+        print(f"fitness = {max(scores)}")
         return scores / sum(scores)  # makes the total equals to 1
 
 
 if __name__ == '__main__':
-    MinMaxPlayer.difficulty = 2
+    MinMaxPlayer.MinMaxPlayer.difficulty = 2
     gen = Generation(20, 100, 1)
     best_player = None
     max_fitness = 0
     for player in gen.players:
-        fitness = player.compute_fitness()
+        fitness = compute_fitness(player)
         if fitness > max_fitness:
             max_fitness = fitness
             best_player = player
