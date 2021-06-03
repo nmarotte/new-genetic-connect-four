@@ -1,7 +1,10 @@
 from __future__ import annotations  # for typing the enclosing class
 
 import abc
-from game import Connect4Game
+import random
+from time import sleep
+
+from game import Connect4Game, Connect4Viewer
 
 
 class Player:
@@ -37,7 +40,6 @@ class Player:
                 game.place(self.choose_action(game))
             else:
                 game.place(opponent.choose_action(game))
-
             winner = game.get_win()
 
         if winner != 0 and not yellow_goes_first:

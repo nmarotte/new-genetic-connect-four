@@ -33,7 +33,7 @@ def get_minmax_game_history(difficulty=2):
     while game.get_win() is None:
         placement = player_a.choose_action(game, difficulty)
         game.place(placement)
-        if game.get_win() is None:
+        if game.get_win() is not None:
             break
 
         placement = player_b.choose_action(game, difficulty)

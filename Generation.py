@@ -1,3 +1,5 @@
+from time import sleep
+
 import progressbar
 import numpy as np
 import pygame
@@ -36,6 +38,22 @@ class Generation:
 
             bar.update(generation)
 
+            # for _ in range(10):
+            #     players = np.random.choice(new_gen, 2, replace=True)
+            #     game = Connect4Game()
+            #     view = Connect4Viewer(game)
+            #     view.initialize()
+            #     winner = game.get_win()
+            #
+            #     while winner is None:
+            #         if game.get_turn() == players[0].player_turn_id:
+            #             game.place(players[0].choose_action(game))
+            #         else:
+            #             game.place(players[1].choose_action(game))
+            #         winner = game.get_win()
+            #         sleep(0.02)
+
+
     def tournament_new(self):
         # Progress bar
         bar = progressbar.ProgressBar(max_value=self.nb_players * self.nb_generations)
@@ -57,7 +75,6 @@ class Generation:
         scores_2 = np.array([10 if p.play_against(p2) == p.player_turn_id else 0 for p, p2 in
                              zip(self.players, np.random.choice(self.players, size=len(self.players)))])
         scores = scores + scores_2
-        print(f"fitness = {max(scores)}")
         return scores / sum(scores)  # makes the total equals to 1
 
 
