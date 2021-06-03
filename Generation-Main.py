@@ -89,7 +89,6 @@ if __name__ == '__main__':
             max_fitness = fitness
             best_player = player
     player = best_player
-    print(max_fitness)
     game = Connect4Game()
     game.reset_game()
     view = Connect4Viewer(game=game)

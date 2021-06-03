@@ -61,3 +61,8 @@ def compute_fitness(player: Player.Player):
         if winner == player.player_turn_id:
             score += 1
     return score
+
+
+if __name__ == '__main__':
+    for _ in range(1):
+        print(get_random_hypothetical_game_history())
