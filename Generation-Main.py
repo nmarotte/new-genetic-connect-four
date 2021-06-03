@@ -38,6 +38,8 @@ class Generation:
 
             bar.update(generation)
 
+
+            # Uncomment this part to see the animation of the generation
             # for _ in range(10):
             #     players = np.random.choice(new_gen, 2, replace=True)
             #     game = Connect4Game()
