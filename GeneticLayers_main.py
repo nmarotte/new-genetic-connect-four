@@ -75,7 +75,7 @@ class Agent:
 
 if __name__ == '__main__':
     nb_agents = 10
-    nb_generations = 1
+    nb_generations = 10
     print(f"Population of {nb_agents} agents over {nb_generations} generations with {MIN_HIDDEN_LAYERS} to "
           f"{MAX_HIDDEN_LAYERS} layers of {MIN_SHAPE} to {MAX_SHAPE} neurons each")
     for g in range(nb_generations):

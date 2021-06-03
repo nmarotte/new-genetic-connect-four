@@ -133,7 +133,6 @@ if __name__ == '__main__':
             main_players = mix_population(main_players, g)
 
         else:
-            print(main_players[-1].score, main_players[-1].nb_played)
             game = Connect4Game()
             game.reset_game()
             view = Connect4Viewer(game=game)

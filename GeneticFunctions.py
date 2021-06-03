@@ -2,7 +2,7 @@ import random
 
 import pygame
 
-from GeneticLayers import Agent
+from GeneticLayers_main import Agent
 from game import Connect4Game, SQUARE_SIZE, Connect4Viewer
 import numpy as np
 
