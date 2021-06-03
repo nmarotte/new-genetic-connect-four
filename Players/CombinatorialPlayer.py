@@ -25,7 +25,7 @@ class CombinatorialPlayer(Player.Player):
     @classmethod
     def reproduce(cls, parents: Collection[CombinatorialPlayer, CombinatorialPlayer]):
         parent_a, parent_b = parents
-        assert parent_a.nb_chromosomes == parent_b.nb_chromosomes  # Zoophilia is forbidden by God
+        assert parent_a.nb_chromosomes == parent_b.nb_chromosomes  # Cannot breed if the number of chromosome is different, for obvious reasons
         nb_chromosomes = parent_a.nb_chromosomes
         # gets chromosomes from the parent
         child_chromosomes = random.choices(parent_a.chromosomes, k=nb_chromosomes//2) + random.choices(parent_b.chromosomes, k=nb_chromosomes//2)
